@@ -16,3 +16,8 @@ Current Limitations:
 Features being worked on:
 
 - Support for Toliss A319 as well as Flightfactor Boeing and Airbus FMC
+
+
+Remarks:
+
+- Some stuff has been stolen from the Sample Scripts as well as the X-plane.org Forums.

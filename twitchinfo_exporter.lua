@@ -303,9 +303,8 @@ function twitchinfo_export()
     twitchinfo_file:write(fms_info..'\n' .. '[Altitude: ' .. V_alt .. ' ft]\n[Groundspeed: ' .. V_msc .. ']\n[Vertical Speed: ' .. V_vsp .. ' fpm]\n[Next Apt: ' .. outName .. ' (' .. outID .. ')]\n[Total Fuel: ' .. V_fuel .. ' at ' .. V_ffph .. ']\n[Airtime: ' .. V_utc_airtime .. ']\n')
     twitchinfo_file:close()
 
-
-		last_metar_and_airport_info = string.format("Last METAR: %s, your next airport: %s (%s) [%s at %2.1f fps] [Altitude: %s ft] [Groundspeed: %s km/h] [Heading: %s] [VS: %s fpm] [%s, dst: %s]", XSB_METAR, outName, outID, PLANE_ICAO, fps, V_alt, V_msc, V_hdg, V_vsp, testID, fms.dest)
-    info_lenght = measure_string( last_metar_and_airport_info, "Helvetica_12" )
+		last_metar_and_airport_info = string.format("Last METAR: %s, your next airport: %s (%s) [%s at %2.1f fps] [Altitude: %s ft] [Groundspeed: %s km/h] [Heading: %s] [VS: %s fpm]", XSB_METAR, outName, outID, PLANE_ICAO, fps, V_alt, V_msc, V_hdg, V_vsp)
+		info_lenght = measure_string( last_metar_and_airport_info, "Helvetica_12" )
 end
 
 
@@ -313,8 +312,8 @@ end
 function show_metar_and_airport()
     -- we can use the predefined variables SCREEN_WIDTH and SCREEN_HIGHT to position the text at the top of the screen
     -- but we need the lenght of the info in pixel
-	glColor4f(1,1,1,1)
-    draw_string_Helvetica_12(SCREEN_WIDTH - info_lenght - 10, SCREEN_HIGHT - 15, last_metar_and_airport_info)
+		glColor4f(1,1,1,1)
+		draw_string_Helvetica_12(SCREEN_WIDTH - info_lenght - 10, SCREEN_HIGHT - 15, last_metar_and_airport_info)
 end
 
 -- register the functions to the callbacks
