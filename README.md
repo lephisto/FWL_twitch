@@ -16,6 +16,7 @@ Current Limitations:
 Features being worked on:
 
 - Support for Toliss A319 as well as Flightfactor Boeing and Airbus FMC
+- Shiny HTML Overlay for OBS (Currently you just read Textinfo from a Textfile)
 
 
 Remarks:

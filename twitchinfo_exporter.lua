@@ -92,7 +92,7 @@ local FLIGHT_TIME_min = 0
 local FLIGHT_TIME_sec = 0
 local UTC_temp
 
--- Let's look for the show_metar_and_airport
+-- Let's look for the homedir, we will store the Export there
 local home_dir = os.getenv( "HOME" )
 
 -- we need a local DataRef for FPS calc
@@ -101,10 +101,10 @@ local fps = 0
 
 -- If the function calc_metar_and_airport() fails, we provide a dummy text.
 -- This is important when Lua starts the script, and the drawing callback starts before the calculation.
-local last_metar_and_airport_info = "Something goes wrong!"
+local ingame_infoline = "Something goes wrong!"
 
 -- We will also have to provide the length of the string in pixel
-local info_lenght = measure_string( last_metar_and_airport_info )
+local info_lenght = measure_string( ingame_infoline )
 
 function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
@@ -208,11 +208,6 @@ end
 
 -- make a function to be every second, finding out the info we need
 function twitchinfo_export()
-    -- the last metar is a string inside the predefined variable XSB_METAR and only filled when online
-    -- we only have to find out the next airport name and position
-    -- we will only get an index to the nav database
-    -- LATITUDE and LONGITUDE are predefined datarefs representing our plane's position
-    -- the nil arguments are used, when we do not care about the search value (name, ID, frequency)
     next_airport_index = XPLMFindNavAid( nil, nil, LATITUDE, LONGITUDE, nil, xplm_Nav_Airport)
 
     -- let's examine the name of the airport we found, all variables should be local
@@ -220,17 +215,13 @@ function twitchinfo_export()
     local outID
     local outName
 
-    -- all output we are not intereted in can be send to variable _ (a dummy variable)
+		-- Translater Index to ICAO Code and Name
     _, _, _, _, _, _, outID, outName = XPLMGetNavAidInfo( next_airport_index )
 
-    -- the last step is to create a global variable the printing function can read out
+    -- Read FPS
     fps = 1/XPLMGetDataf(frame_rate_ref)
 
-    -- fms_entries = XPLMCountFMSEntries()
-    -- dst_airport_index = dataref_table("sim/cockpit/gps/destination_index")
-    -- _, _, _, _, _, _, dstID, dstName = XPLMGetNavAidInfo( dst_airport_index )
-    --V_msc = (XPLMGetDataf(XPLMFindDataRef("sim/flightmodel/position/groundspeed"))*3600)/1000
-    --V_msc = round(V_msc,0)
+
     V_hdg = XPLMGetDataf(XPLMFindDataRef("sim/flightmodel/position/mag_psi"))
     V_hdg = round(V_hdg,0)
     V_vsp = XPLMGetDataf(XPLMFindDataRef("sim/cockpit2/gauges/indicators/vvi_fpm_pilot"))
@@ -249,7 +240,6 @@ function twitchinfo_export()
     V_ffph = string.format("%05.2f", FFPS_value*60) .. " kg/m"
 
 		DataRef( "V_tailnum", "sim/aircraft/view/acf_tailnum" )
-		-- logMsg ("twitchinfo_exporter: tailnum: " .. V_tailnum)
 
 		if V_tailnum == 'ZB738' then
 		  -- Zibo
@@ -290,6 +280,7 @@ function twitchinfo_export()
 		end
 
 		if V_tailnum == 'A319' then
+			-- Toliss A319 - This is incomplete, currently there's no Way to access the FMC.
 			fms.count = XPLMCountFMSEntries()
 		end
 
@@ -299,12 +290,13 @@ function twitchinfo_export()
 		  fms_info = '[Unsupported FMS]'
 		end
 
+		-- Write Info to Disk
     local twitchinfo_file = io.open(home_dir .. '/xp11_stats.txt',"w")
     twitchinfo_file:write(fms_info..'\n' .. '[Altitude: ' .. V_alt .. ' ft]\n[Groundspeed: ' .. V_msc .. ']\n[Vertical Speed: ' .. V_vsp .. ' fpm]\n[Next Apt: ' .. outName .. ' (' .. outID .. ')]\n[Total Fuel: ' .. V_fuel .. ' at ' .. V_ffph .. ']\n[Airtime: ' .. V_utc_airtime .. ']\n')
     twitchinfo_file:close()
 
-		last_metar_and_airport_info = string.format("Last METAR: %s, your next airport: %s (%s) [%s at %2.1f fps] [Altitude: %s ft] [Groundspeed: %s km/h] [Heading: %s] [VS: %s fpm]", XSB_METAR, outName, outID, PLANE_ICAO, fps, V_alt, V_msc, V_hdg, V_vsp)
-		info_lenght = measure_string( last_metar_and_airport_info, "Helvetica_12" )
+		ingame_infoline = string.format("Last METAR: %s, your next airport: %s (%s) [%s at %2.1f fps] [Altitude: %s ft] [Groundspeed: %s km/h] [Heading: %s] [VS: %s fpm]", XSB_METAR, outName, outID, PLANE_ICAO, fps, V_alt, V_msc, V_hdg, V_vsp)
+		info_lenght = measure_string( ingame_infoline, "Helvetica_12" )
 end
 
 
@@ -313,7 +305,7 @@ function show_metar_and_airport()
     -- we can use the predefined variables SCREEN_WIDTH and SCREEN_HIGHT to position the text at the top of the screen
     -- but we need the lenght of the info in pixel
 		glColor4f(1,1,1,1)
-		draw_string_Helvetica_12(SCREEN_WIDTH - info_lenght - 10, SCREEN_HIGHT - 15, last_metar_and_airport_info)
+		draw_string_Helvetica_12(SCREEN_WIDTH - info_lenght - 10, SCREEN_HIGHT - 15, ingame_infoline)
 end
 
 -- register the functions to the callbacks
