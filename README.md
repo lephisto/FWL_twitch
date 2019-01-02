@@ -3,6 +3,8 @@ FlyWithLua Twitch Plugin for X-Plane 11
 
 Plugin to Provide Flightdata for a Openbroadcaster Overlay
 
+![Screenshot](https://github.com/lephisto/FWL_twitch/raw/master/twitchexporter_ss.png)
+
 Requires FlyWithLua
 
 Place twitchinfo_exporter in your FWL Scripts Directory.
